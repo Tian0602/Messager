@@ -2,15 +2,33 @@ from ..models.message import Message
 from ..database import SessionLocal
 from ..database.message_db import MessageDBModel
 
-# Fetch unread messages
 def fetch_unread(recipient: str) -> list[Message]:
+    """
+    Retrieves all unread messages for a given recipient.
+
+    Args:
+        recipient (str): The username of the message recipient.
+
+    Returns:
+        list[Message]: A list of unread messages.
+    """
     db = SessionLocal()
     db_msgs = db.query(MessageDBModel).filter_by(recipient=recipient, read=False).all()
     db.close()
     return [msg.to_message() for msg in db_msgs]
 
-# Fetch messages ordered by time
 def fetch_time(recipient: str, start: int = 0, stop: int = None) -> list[Message]:
+    """
+    Retrieves messages for a recipient ordered by timestamp, optionally paginated.
+
+    Args:
+        recipient (str): The username of the message recipient.
+        start (int): The starting index for pagination (default is 0).
+        stop (int | None): The stopping index for pagination (exclusive).
+
+    Returns:
+        list[Message]: A list of messages sorted by time.
+    """
     db = SessionLocal()
     query = db.query(MessageDBModel).filter_by(recipient=recipient).order_by(MessageDBModel.timestamp)
     if stop is not None:
@@ -21,8 +39,17 @@ def fetch_time(recipient: str, start: int = 0, stop: int = None) -> list[Message
     db.close()
     return [msg.to_message() for msg in db_msgs]
 
-# Mark a message as read
 def read_message(recipient: str, message_id: str) -> bool:
+    """
+    Marks a message as read.
+
+    Args:
+        recipient (str): The username of the message recipient.
+        message_id (str): The ID of the message to mark as read.
+
+    Returns:
+        bool: True if the message was successfully updated, False otherwise.
+    """
     db = SessionLocal()
     message = db.query(MessageDBModel).filter_by(id=message_id, recipient=recipient).first()
     if message:

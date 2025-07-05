@@ -1,4 +1,7 @@
 from __future__ import annotations
+"""
+This module defines the SQLAlchemy database model for storing messages.
+"""
 from sqlalchemy import Column, String, DateTime, Boolean, Integer, PrimaryKeyConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from uuid import uuid4
@@ -8,6 +11,12 @@ from ..models.message import Message
 Base = declarative_base()
 
 class MessageDBModel(Base):
+    """
+    SQLAlchemy ORM model for the messages table.
+
+    Each message is uniquely identified by a composite key: (recipient, id),
+    where `id` is an integer scoped per recipient.
+    """
     __tablename__ = "messages"
 
     id = Column(Integer, nullable=False)
@@ -21,7 +30,9 @@ class MessageDBModel(Base):
         PrimaryKeyConstraint('recipient', 'id'),
     )
     def to_message(self):
-        
+        """
+        Converts this SQLAlchemy model instance to a Pydantic Message object.
+        """
         return Message(
             id=self.id,
             sender=self.sender,
@@ -33,6 +44,9 @@ class MessageDBModel(Base):
 
     @staticmethod
     def from_message(message: Message) -> MessageDBModel:
+        """
+        Creates a SQLAlchemy MessageDBModel from a Pydantic Message.
+        """
         return MessageDBModel(
             id=message.id,
             sender=message.sender,
