@@ -2,7 +2,7 @@ from ..database import SessionLocal
 from ..database.message_db import MessageDBModel
 
 # Delete a single message
-def delete_message(recipient: str, message_id: str) -> bool:
+def delete_message(recipient: str, message_id: int) -> bool:
     db = SessionLocal()
     message = db.query(MessageDBModel).filter_by(id=message_id, recipient=recipient).first()
     if message:
@@ -14,13 +14,11 @@ def delete_message(recipient: str, message_id: str) -> bool:
     return False
 
 # Delete messages
-def delete_messages(message_ids: list[str]) -> int:
+def delete_messages(recipient: str, message_ids: list[int]) -> int:
     db = SessionLocal()
     count = 0
     for message_id in message_ids:
-        message = db.query(MessageDBModel).filter_by(id=message_id).first()
-        if message:
-            db.delete(message)
+        if delete_message(recipient, message_id):
             count += 1
     db.commit()
     db.close()

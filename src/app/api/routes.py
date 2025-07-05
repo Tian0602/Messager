@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from ..models.message import Message, MessageCreate, MessageIDRequest
+from ..models.message import Message, MessageCreate
 from ..services.message_create import create_message
 
 from ..services.message_delete import delete_message, delete_messages
@@ -32,13 +32,15 @@ def get_all(recipient: str, start: int = 0, stop: int = None):
 
 # Delete a message
 @router.delete("/messages/{recipient}/delete/{message_id}")
-def delete_one(recipient: str, message_id: str):
+def delete_one(recipient: str, message_id: int):
     if not delete_message(recipient, message_id):
         raise HTTPException(status_code=404, detail="Message not found")
     return {"status": "deleted"}
 
 # Delete several messages
 @router.delete("/messages/{recipient}/delete")
-def delete_multiple(req: MessageIDRequest):
-    deleted_count = delete_messages(req.message_ids)
+def delete_multiple(recipient: str, req: list[int]):
+    deleted_count = delete_messages(recipient, req)
+    if deleted_count != len(req):
+        raise HTTPException(status_code=404, detail=f"Some messages not found, {deleted_count} messages were deleted")
     return {"deleted": deleted_count}

@@ -9,7 +9,7 @@ class DatabaseMessageStorage:
         db.commit()
         db.close()
 
-    def get(self, recipient: str, message_id: str) -> Message | None:
+    def get(self, recipient: str, message_id: int) -> Message | None:
         db = SessionLocal()
         db_obj = db.query(MessageDBModel).filter_by(id=message_id, recipient=recipient).first()
         db.close()
