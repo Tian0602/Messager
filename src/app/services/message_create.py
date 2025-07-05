@@ -1,12 +1,14 @@
 from ..models.message import Message, MessageCreate
-from ..data.memory import storage
+from ..database import SessionLocal
+from ..database.message_db import MessageDBModel
 
 
 # Submit a message
 def create_message(msg_data: MessageCreate) -> Message:
     message = Message(**msg_data.dict())
-    recipient = message.recipient
-    if recipient not in storage:
-        storage[recipient] = {}
-    storage[recipient][str(message.id)] = message
+    db = SessionLocal()
+    db_message = MessageDBModel.from_message(message)
+    db.add(db_message)
+    db.commit()
+    db.close()
     return message
