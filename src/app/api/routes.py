@@ -19,11 +19,12 @@ def get_unread(recipient: str):
     return msgs
 
 # Open(Read) a message
-@router.get("/messages/{recipient}/open/{message_id}")
+@router.patch("/messages/{recipient}/{message_id}", response_model=Message)
 def open_message(recipient: str, message_id: str):
-    if not read_message(recipient, message_id):
+    msg = read_message(recipient, message_id)
+    if msg is None:
         raise HTTPException(status_code=404, detail="Message not found")
-    return {"status": "read"}
+    return msg
 
 # Get all messages by time
 @router.get("/messages/{recipient}")

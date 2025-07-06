@@ -39,23 +39,24 @@ def fetch_time(recipient: str, start: int = 0, stop: int = None) -> list[Message
     db.close()
     return [msg.to_message() for msg in db_msgs]
 
-def read_message(recipient: str, message_id: str) -> bool:
+def read_message(recipient: str, message_id: str) -> Message | None:
     """
-    Marks a message as read.
+    Marks a message as read and returns the updated message.
 
     Args:
         recipient (str): The username of the message recipient.
         message_id (str): The ID of the message to mark as read.
 
     Returns:
-        bool: True if the message was successfully updated, False otherwise.
+        Message | None: The updated message if found, else None.
     """
     db = SessionLocal()
     message = db.query(MessageDBModel).filter_by(id=message_id, recipient=recipient).first()
     if message:
         message.read = True
         db.commit()
+        result = message.to_message()
         db.close()
-        return True
+        return result
     db.close()
-    return False
+    return None
