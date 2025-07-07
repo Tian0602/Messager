@@ -41,3 +41,18 @@ def delete_messages(recipient: str, message_ids: list[int]) -> int:
     db.commit()
     db.close()
     return count
+
+def delete_messages_keyword(recipient: str, keyword: str) -> bool:
+    db = SessionLocal()
+    count = 0
+    msgs = db.query(MessageDBModel).filter(
+                MessageDBModel.recipient == recipient,
+                MessageDBModel.content.ilike(f"%{keyword}%")
+            ).all()
+    if msgs:
+        for msg in msgs:
+            db.delete(msg)
+            count += 1
+        db.commit()
+    db.close()
+    return count

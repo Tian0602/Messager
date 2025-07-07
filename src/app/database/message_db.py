@@ -4,7 +4,6 @@ This module defines the SQLAlchemy database model for storing messages.
 """
 from sqlalchemy import Column, String, DateTime, Boolean, Integer, PrimaryKeyConstraint
 from sqlalchemy.ext.declarative import declarative_base
-from uuid import uuid4
 from datetime import datetime
 from ..models.message import Message
 

@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from ..models.message import Message, MessageCreate
 from ..services.message_create import create_message
 
-from ..services.message_delete import delete_message, delete_messages
+from ..services.message_delete import delete_message, delete_messages, delete_messages_keyword
 from ..services.message_fetch import fetch_unread, fetch_time, read_message
 
 router = APIRouter()
@@ -44,4 +44,10 @@ def delete_multiple(recipient: str, req: list[int]):
     deleted_count = delete_messages(recipient, req)
     if deleted_count != len(req):
         raise HTTPException(status_code=404, detail=f"Some messages not found, {deleted_count} messages were deleted")
+    return {"deleted": deleted_count}
+
+# Delete several messages including keyword
+@router.delete("/messages/{recipient}/delete/keyword/{keyword}")
+def delete_multiple(recipient: str, keyword: str):
+    deleted_count = delete_messages_keyword(recipient, keyword)
     return {"deleted": deleted_count}
